@@ -1,1 +1,1 @@
-"# demo-entity-with-payload-property" 
+# demo-entity-with-payload-property
