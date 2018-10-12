@@ -31,14 +31,14 @@ public class DemoEntityWithPayloadPropertyApplication {
 			TestEntityWithComposite entity = new TestEntityWithComposite();
 			entity.setName("my name");
 			entity.setPhone(new Phone(1, "12345"));
-			entity.setPaymentPayload(new PaymentPayload<>(trn));
+			entity.setPaymentPayload(new PaymentPayload(CreditTransferTransaction.class, trn));
 			 repository.save(entity);
 
 			trn =  new CreditTransferTransaction("MyId2","2creditPartyId","2debitPArtyId",BigDecimal.valueOf(2.1));
 			entity = new TestEntityWithComposite();
 			entity.setName("my name");
 			entity.setPhone(new Phone(1, "12345"));
-			entity.setPaymentPayload(new PaymentPayload<>(trn));
+			entity.setPaymentPayload(new PaymentPayload(CreditTransferTransaction.class, trn));
 			repository.save(entity);
 		});
 

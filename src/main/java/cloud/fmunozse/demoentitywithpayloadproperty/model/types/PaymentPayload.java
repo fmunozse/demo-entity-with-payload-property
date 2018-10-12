@@ -6,18 +6,21 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-@AllArgsConstructor
-public class PaymentPayload<T> {
+public class PaymentPayload {
 
     @NotNull
-    private Class type;
+    private Class classType;
 
     @NotNull
-    private T payload;
+    private Object payload;
 
-    public PaymentPayload(T payload) {
-
+    public PaymentPayload(Class classType, Object payload) {
+        this.classType = classType;
         this.payload = payload;
-        this.type = payload.getClass();
     }
+
+    public <T> T getPayloadTyped () {
+        return (T)payload;
+    }
+
 }

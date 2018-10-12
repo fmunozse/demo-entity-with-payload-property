@@ -1,6 +1,5 @@
 package cloud.fmunozse.demoentitywithpayloadproperty.model.types;
 
-import cloud.fmunozse.demoentitywithpayloadproperty.model.types.iso2022.CreditTransferTransaction;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.HibernateException;
@@ -20,7 +19,7 @@ public class PaymentPayloadType implements CompositeUserType {
 
     @Override
     public String[] getPropertyNames() {
-        return new String[]{"type", "payload"};
+        return new String[]{"classType", "payload"};
     }
 
     @Override
@@ -37,7 +36,7 @@ public class PaymentPayloadType implements CompositeUserType {
         if (o == null) {
             return null;
         } else if (i == 0) {
-            return ((PaymentPayload) o).getType();
+            return ((PaymentPayload) o).getClassType();
         } else if (i == 1) {
             return ((PaymentPayload) o).getPayload();
         }
@@ -49,13 +48,14 @@ public class PaymentPayloadType implements CompositeUserType {
         if (o != null) {
             if (i == 0) {
                 try {
-                    ((PaymentPayload) o).setType( Class.forName( (String) o1));
+                    ((PaymentPayload) o).setClassType( Class.forName( (String) o1));
                 } catch (ClassNotFoundException e) {
                     throw new HibernateException(e);
                 }
             } else if (i == 1 && o1 != null) {
                 try {
-                    ((PaymentPayload) o).setPayload( mapper.readValue((String)o1, ((PaymentPayload) o).getType() ) );
+                    Class clazz =  ((PaymentPayload) o).getClassType();
+                    ((PaymentPayload) o).setPayload( mapper.readValue((String)o1 , clazz));
                 } catch (IOException e) {
                     throw new HibernateException(e);
                 }
@@ -91,7 +91,7 @@ public class PaymentPayloadType implements CompositeUserType {
     public Object nullSafeGet(ResultSet rs, String[] strings, SessionImplementor si, Object o) throws HibernateException, SQLException {
         try {
             Class clazz = Class.forName(rs.getString(strings[0]));
-            return new PaymentPayload<>(mapper.readValue(rs.getString(strings[1]) , clazz) );
+            return new PaymentPayload(clazz, mapper.readValue(rs.getString(strings[1]) , clazz) );
         } catch (ClassNotFoundException e) {
             throw new HibernateException(e);
         } catch (IOException e) {
@@ -102,7 +102,7 @@ public class PaymentPayloadType implements CompositeUserType {
     @Override
     public void nullSafeSet(PreparedStatement ps, Object o, int i, SessionImplementor si) throws HibernateException, SQLException {
         if (o != null) {
-            ps.setString(i, ((PaymentPayload) o).getType().getName());
+            ps.setString(i, ((PaymentPayload) o).getClassType().getName());
             try {
                 ps.setString(i + 1,  mapper.writeValueAsString(((PaymentPayload) o).getPayload()));
             } catch (JsonProcessingException e) {
@@ -119,7 +119,7 @@ public class PaymentPayloadType implements CompositeUserType {
         if (o != null) {
             PaymentPayload newPaymentPayload = (PaymentPayload) o;
             //TODO Check deepCopy of Object ...
-            return new PaymentPayload<>(newPaymentPayload.getPayload());
+            return new PaymentPayload(newPaymentPayload.getClassType(), newPaymentPayload.getPayload());
         }
         return null;
     }

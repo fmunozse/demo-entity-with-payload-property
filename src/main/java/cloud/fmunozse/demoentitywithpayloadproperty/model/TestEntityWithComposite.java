@@ -36,7 +36,7 @@ public class TestEntityWithComposite {
     @NotNull
     @Type(type = "cloud.fmunozse.demoentitywithpayloadproperty.model.types.PaymentPayloadType")
     @Columns(columns = {
-            @Column(name = "type", nullable = false),
+            @Column(name = "classType", nullable = false),
             @Column(name = "payload", nullable = false)
     })
     private PaymentPayload paymentPayload;

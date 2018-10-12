@@ -35,8 +35,7 @@ public class TestEntityWithCompositeRepositoryTest {
         TestEntityWithComposite entity = new TestEntityWithComposite();
         entity.setName("my name");
         entity.setPhone(new Phone(1, "12345"));
-
-        PaymentPayload<CreditTransferTransaction> paymentPayload = new PaymentPayload<CreditTransferTransaction>(CreditTransferTransaction.class, trn);
+        PaymentPayload paymentPayload = new PaymentPayload(CreditTransferTransaction.class, trn);
 
         entity.setPaymentPayload(paymentPayload);
 
@@ -54,15 +53,19 @@ public class TestEntityWithCompositeRepositoryTest {
         CreditTransferTransaction trn = createCreditTransferTransactionFake("MyId2");
         TestEntityWithComposite entity = new TestEntityWithComposite();
         entity.setName("my name");
-        entity.setPhone(new Phone(3, "12345"));
-        entity.setPaymentPayload(new PaymentPayload<>(CreditTransferTransaction.class, trn));
+        entity.setPaymentPayload(new PaymentPayload(CreditTransferTransaction.class, trn));
 
         entity = testEntityWithCompositeRepository.saveAndFlush(entity);
         entity = testEntityWithCompositeRepository.findOne(entity.getId());
 
-        assertThat(entity.getPhone().getAreaCode(), is(3));
-        assertThat(entity.getPhone().getPhoneNum(), is ("12345"));
-        assertThat(mapper.writeValueAsString(entity.getPaymentPayload().getPayload()), hasJsonPath("$.id", is("MyId2")));
+
+        //TODO Notices the getPayload like Object
+        String  jsonMapped = mapper.writeValueAsString(entity.getPaymentPayload().getPayload());
+        assertThat(jsonMapped, hasJsonPath("$.id", is("MyId2")));
+
+        //TODO Notices the getPayloadType like typed
+        CreditTransferTransaction trn2 = entity.getPaymentPayload().getPayloadTyped();
+        assertThat(trn2.getCreditPartyAgentId() , is("creditPartyId"));
 
     }
 
